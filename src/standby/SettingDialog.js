@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Box, Button,
-    Dialog, FormControl, IconButton, MenuItem, Select, Tab, Tabs,
+    Dialog, FormControl, IconButton, LinearProgress, MenuItem, Select, Tab, Tabs,
     Typography,
 } from "@material-ui/core";
 import BackgroundImage from '../common/images/BackgroundImage.png';
@@ -151,14 +151,14 @@ const style = theme => ({
         }
     },
     audioBar:{
-        background:'#c4c4c4',
-        width:330,
-        height: 10
-    },
-    audioBarColor:{
-        width: 108,
-        height: 'inherit',
-        background:'#3d68fe'
+        '& .MuiLinearProgress-root':{
+            background:'#c4c4c4',
+            width:330,
+            height: 10,
+        },
+        '& .MuiLinearProgress-bar':{
+            background:'#3d68fe'
+        }
     },
     testButtonBox:{
         width:330,
@@ -204,6 +204,7 @@ class SettingDialog extends Component {
             audioDeviceValue: 'audio1',
             changeSpeakerAnchorEl: null,
             testButton: true,
+            completed: 40,
         };
     }
 
@@ -312,7 +313,7 @@ class SettingDialog extends Component {
                             </FormControl>
 
                             <Box className={classes.audioBar}>
-                                <Box className={classes.audioBarColor}></Box>
+                                <LinearProgress variant="determinate" value={this.state.completed}/>
                             </Box>
                         </Box>
                         }
