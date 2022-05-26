@@ -5,7 +5,6 @@ import {
     Dialog, FormControl, IconButton, LinearProgress, MenuItem, Select, Tab, Tabs,
     Typography,
 } from "@material-ui/core";
-import BackgroundImage from '../common/images/BackgroundImage.png';
 import { ReactComponent as CloseIcon } from '../common/images/CloseIcon.svg';
 import {ReactComponent as CameraOn} from "../common/images/CameraOn.svg";
 import {ReactComponent as MikeOn} from "../common/images/MikeOn.svg";
@@ -141,14 +140,10 @@ const style = theme => ({
         width: 112,
         height: 70,
         borderRadius: 3,
-        background: '#eee',
+        background:'linear-gradient(to bottom, #354767, #202226)',
         marginLeft: 15,
         overflow:'hidden',
-        '& img':{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover'
-        }
+
     },
     audioBar:{
         '& .MuiLinearProgress-root':{
@@ -204,22 +199,16 @@ class SettingDialog extends Component {
             audioDeviceValue: 'audio1',
             changeSpeakerAnchorEl: null,
             testButton: true,
-            completed: 40,
+
         };
     }
 
-    handleChangeMicDevice = event => {
-        this.setState({ micDeviceValue: event.target.value });
-    };
-
-    handleChangeAudioDevice = event => {
-        this.setState({ audioDeviceValue: event.target.value });
-    };
-
     handleClickTestButton = () => {
-        this.setState({
-            testButton: !this.state.testButton,
-        });
+        if(this.state.testButton) {
+            this.handlePlaySound();
+        }else {
+            this.handleStopSound();
+        }
     };
 
     handleClickChangeSpeaker = event => {
@@ -234,15 +223,46 @@ class SettingDialog extends Component {
         });
     };
 
+    handlePlaySound = () => {
+        const testSoundContext = document.getElementById('soundSample01');
+
+        if (testSoundContext) {
+            testSoundContext.play();
+            this.setState({
+                testButton: false,
+            });
+        }
+    };
+
+    handleStopSound = () => {
+        const testSoundContext = document.getElementById('soundSample01');
+
+        if (testSoundContext) {
+            testSoundContext.pause();
+            this.setState({
+                testButton: true,
+            });
+        }
+    };
+
+    handleDialogClose = () => {
+        this.setState({
+            testButton: true
+        })
+        if(this.props.handleDialogClose) {
+            this.props.handleDialogClose();
+        }
+    }
+
     render() {
-        const { classes, dialogOpen, handleDialogClose, settingValue, handleTabChange } = this.props;
-        const { micDeviceValue, audioDeviceValue, changeSpeakerAnchorEl, testButton } = this.state;
+        const { classes, dialogOpen, settingValue, handleTabChange, handleChangeCamDevice, handleChangeMicDevice, selectedCamId, camDevices,  micDevices, selectedMicId, camPreviewRef} = this.props;
+        const {changeSpeakerAnchorEl, testButton} = this.state;
         const changeSpeakerOpen = Boolean(changeSpeakerAnchorEl);
 
         return (
             <Dialog
                 open={dialogOpen}
-                onClose={handleDialogClose}
+                onClose={this.handleDialogClose}
                 aria-labelledby="draggable-dialog-title"
                 className={classes.dialogBox}
             >
@@ -257,7 +277,7 @@ class SettingDialog extends Component {
                     </Box>
                     <Box className={classes.rightBox}>
                         <Box className={classes.closeBox}>
-                            <IconButton className={classes.iconButton} onClick={handleDialogClose} disableRipple>
+                            <IconButton className={classes.iconButton} onClick={this.handleDialogClose} disableRipple>
                                 <CloseIcon/>
                             </IconButton>
                         </Box>
@@ -268,25 +288,31 @@ class SettingDialog extends Component {
                                     <Typography className={classes.textStyle}>카메라</Typography>
                                     <FormControl variant="outlined" className={classes.formControl}>
                                         <Select
-                                            value={micDeviceValue}
-                                            onChange={this.handleChangeMicDevice}
+                                            value={(camDevices.length > 0) && selectedCamId ? selectedCamId : ''}
+                                            onChange={handleChangeCamDevice}
                                             IconComponent={() => (
                                                 <Box style={{ marginRight: 10 }}>
                                                     <CaretDown />
                                                 </Box>
                                             )}
                                         >
-                                            <MenuItem className={classes.menuItem} value={'camera1'}>
-                                                <Typography className={classes.menuText}> CyberLink YouCam 9</Typography>
-                                            </MenuItem>
-                                            <MenuItem className={classes.menuItem} value={'camera2'}>
-                                                <Typography className={classes.menuText}>camera</Typography>
-                                            </MenuItem>
+                                            {camDevices.map(device =>
+                                                <MenuItem className={classes.menuItem} key={`cam-device-${device.deviceId}`} value={device.deviceId}>
+                                                    {(!device.label) && (!device.deviceId) ?
+                                                        <Typography className={classes.menuText}>알수없는 장치</Typography>
+                                                        :
+                                                        (!device.label) && (device.deviceId) ?
+                                                            <Typography className={classes.menuText}>장치-{device.deviceId.slice(0, 10)}</Typography>
+                                                            :
+                                                            <Typography className={classes.menuText}>{device.label}</Typography>
+                                                    }
+                                                </MenuItem>
+                                            )}
                                         </Select>
                                     </FormControl>
                                 </Box>
                                 <Box className={classes.videoBox}>
-                                    <img src={BackgroundImage} alt='영상'/>
+                                    <video ref={camPreviewRef} style={{width:112, height:70}} autoPlay playsInline muted />
                                 </Box>
                             </Box>
                         }
@@ -295,25 +321,31 @@ class SettingDialog extends Component {
                             <Typography className={classes.textStyle}>오디오</Typography>
                             <FormControl variant="outlined" className={classes.formControl}>
                                 <Select
-                                    value={audioDeviceValue}
-                                    onChange={this.handleChangeAudioDevice}
+                                    value={(micDevices.length > 0) && selectedMicId ? selectedMicId : ''}
+                                    onChange={handleChangeMicDevice}
                                     IconComponent={() => (
                                         <Box style={{ marginRight: 10 }}>
                                             <CaretDown />
                                         </Box>
                                     )}
                                 >
-                                    <MenuItem className={classes.menuItem} value={'audio1'}>
-                                        <Typography className={classes.menuText}>기본값 - 마이크(Synaptics smartAudio Synaptics smartAudio)</Typography>
-                                    </MenuItem>
-                                    <MenuItem className={classes.menuItem} value={'audio2'}>
-                                        <Typography className={classes.menuText}>audioDeviceValue</Typography>
-                                    </MenuItem>
+                                    {micDevices.map(device =>
+                                        <MenuItem className={classes.menuItem} key={`mic-device-${device.deviceId}`} value={device.deviceId}>
+                                            {(!device.label) && (!device.deviceId) ?
+                                                <Typography className={classes.menuText}>알수없는 장치</Typography>
+                                                :
+                                                (!device.label) && (device.deviceId) ?
+                                                    <Typography className={classes.menuText}>장치-{device.deviceId.slice(0, 10)}</Typography>
+                                                    :
+                                                    <Typography className={classes.menuText}>{device.label}</Typography>
+                                            }
+                                        </MenuItem>
+                                    )}
                                 </Select>
                             </FormControl>
 
                             <Box className={classes.audioBar}>
-                                <LinearProgress variant="determinate" value={this.state.completed}/>
+                                <LinearProgress variant="determinate" value={this.props.completed}/>
                             </Box>
                         </Box>
                         }
@@ -339,6 +371,9 @@ class SettingDialog extends Component {
                                     스피커 변경 방법
                                 </Button>
                                 <ChangeSpeakerPopover changeSpeakerOpen={changeSpeakerOpen} changeSpeakerAnchorEl={changeSpeakerAnchorEl} handleCloseChangeSpeaker={this.handleCloseChangeSpeaker}/>
+
+                                <audio id={"soundSample01"}
+                                       src={"https://kr.object.gov-ncloudstorage.com/onthelive/soundSample/soundSample01.mp3"}/>
                             </Box>
                         }
                     </Box>
