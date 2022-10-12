@@ -1,53 +1,74 @@
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import {Box, Button, Typography} from "@material-ui/core";
-import BackgroundImage from '../common/images/BackgroundImage.png';
-import { ReactComponent as CameraOn } from '../common/images/CameraOn.svg';
-import { ReactComponent as MikeOn } from '../common/images/MikeOn.svg';
-import { ReactComponent as SoundOn } from '../common/images/SoundOn.svg';
+import BackgroundImage from '../../common/images/BackgroundImage.png';
+import { ReactComponent as CameraOn } from '../../common/images/CameraOn.svg';
+import { ReactComponent as MikeOn } from '../../common/images/MikeOn.svg';
+import { ReactComponent as SoundOn } from '../../common/images/SoundOn.svg';
 import clsx from "clsx";
-import SettingDialog from "./SettingDialog";
-import {MediaQuality, MediaUtil} from "../common/lib/MediaUtil";
-import SoundMeter from "../common/lib/SoundMeter";
+import {MediaQuality, MediaUtil} from "../../common/lib/MediaUtil";
+import SoundMeter from "../../common/lib/SoundMeter";
+import Logo from "../../common/images/Logo.png";
+import MobileSettingDialog from "./MobileSettingDialog";
 
 const style = theme => ({
     root:{
         width: '100%',
-        height: 'calc(100vh - 82px)',
+        height: '100vh',
         display: 'flex',
-        justifyContent: 'center',
-        paddingTop: 170,
+        flexDirection:'column',
+        justifyContent: 'flex-start',
         boxSizing: 'border-box',
+        padding: 0,
         background: '#fdfbf7',
         '& *': {
             fontFamily: 'Noto Sans KR',
+            letterSpacing: '-0.2px'
         },
-        '@media all and (max-width: 1200px)': {
-            paddingLeft: 25,
-            paddingRight: 25,
-        },
+    },
+    topBox:{
+        width: '100%',
+        height: 55,
+        padding: '0 15px',
+        boxSizing: 'border-box',
+        borderBottom: '2px solid #3c68ff',
+        display: 'flex',
+        alignItems:'center',
+        '& img':{
+            width: 90,
+            '@media all and (min-width: 374px)': {
+                width: 100,
+            },
+        }
+    },
+    imgBox:{
+        width: '100%',
+        marginTop: 15,
+        '& img':{
+            width: '100%'
+        }
     },
     contentsBox:{
-        width: 1140,
+        width: '100%',
+        height: 'calc(100% - 55px)',
+        boxSizing: 'border-box',
+        padding: '35px 15px 20px',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        '@media all and (max-width: 1200px)': {
-            width: '100%',
-        },
+        flexDirection: 'column',
+        justifyContent:'space-between'
     },
     titleText:{
-        fontSize: '2.375rem',
+        fontSize: '1.125rem',
         fontWeight: 'bold',
-        marginBottom: 30,
-        '@media all and (max-width: 950px)': {
-            fontSize: '2rem',
+        marginBottom: 8,
+        '@media all and (min-width: 374px)': {
+            fontSize: '1.375rem',
         },
     },
     textStyle:{
-        fontSize: '1.25rem',
+        fontSize: '0.75rem',
         fontWeight: 300,
-        '@media all and (max-width: 950px)': {
+        '@media all and (min-width: 374px)': {
             fontSize: '1rem',
         },
     },
@@ -56,63 +77,44 @@ const style = theme => ({
         justifyContent: 'space-between',
         marginTop: 13
     },
-    imgBox:{
-        '@media all and (max-width: 1200px)': {
-            width: 465,
-            height: 262,
-            '& img':{
-                width: '100%'
-            }
-        },
-        '@media all and (max-width: 950px)': {
-            width: 400,
-            height: 225,
-            '& img':{
-                width: '100%'
-            }
-        },
-    },
     buttonStyle:{
-        width: 164,
-        height: 65,
+        width: 'calc((100% / 3) - 10px)',
+        height: 44,
         background: '#333',
-        borderRadius: 16,
+        borderRadius: 10,
         boxSizing: 'border-box',
         '&:hover':{
             background: '#333',
         },
-        '@media all and (max-width: 1200px)': {
-            width: 145,
-            height: 60,
-            borderRadius: 10,
-        },
-        '@media all and (max-width: 950px)': {
-            width: 120,
-            height: 55,
-            borderRadius: 8,
-        },
+        '& svg':{
+            width: 28,
+            height: 28
+        }
     },
     buttonColor:{
-        width: 162,
-        height: 63,
         border: '1.6px solid #000',
         background:'#fff',
         '&:hover':{
             background: '#fff',
+        }
+    },
+    footerText:{
+        fontSize: '0.625rem',
+        color: '#7e7e7e',
+        marginRight: 10,
+        textDecoration: 'none',
+        '&:last-child':{
+            borderLeft: '0.5px solid #7e7e7e',
+            paddingLeft: 10,
         },
-        '@media all and (max-width: 1200px)': {
-            width: 145,
-            height: 60,
-        },
-        '@media all and (max-width: 950px)': {
-            width: 120,
-            height: 55,
+        '@media all and (min-width: 374px)': {
+            fontSize: '0.875rem',
         },
     }
 });
 
 const LogPrefix = "[Standby]"
-class Standby extends Component {
+class MobileStandby extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -367,45 +369,59 @@ class Standby extends Component {
 
         return (
             <div className={classes.root}>
+                <Box className={classes.topBox}>
+                    <img src={Logo} alt='e학습터 로고'/>
+                </Box>
                 <Box className={classes.contentsBox}>
                     <Box>
-                        <Typography className={classes.titleText}>
-                            e학습터 화상수업에 오신<br/>
-                            여러분을 환영합니다.
-                        </Typography>
-                        <Typography className={classes.textStyle}>
-                            원격수업에 입장하기 전 환경설정을 확인해주세요.
-                        </Typography>
-                    </Box>
-                    <Box>
-                        <Box className={classes.imgBox}>
-                            <img src={BackgroundImage} alt='배경 이미지'/>
+                        <Box>
+                            <Typography className={classes.titleText}>
+                                e학습터 화상수업에 오신<br/>
+                                여러분을 환영합니다.
+                            </Typography>
+                            <Typography className={classes.textStyle}>
+                                원격수업에 입장하기 전 환경설정을 확인해주세요.
+                            </Typography>
                         </Box>
+                        <Box>
+                            <Box className={classes.imgBox}>
+                                <img src={BackgroundImage} alt='배경 이미지'/>
+                            </Box>
 
-                        <Box className={classes.flexBox}>
-                            <Button className={classes.buttonStyle} onClick={() => this.handleDialogOpen(0)} disableRipple><CameraOn/></Button>
-                            <Button className={clsx(classes.buttonStyle, classes.buttonColor)} onClick={() => this.handleDialogOpen(1)} disableRipple><MikeOn/></Button>
-                            <Button className={classes.buttonStyle} onClick={() => this.handleDialogOpen(2)} disableRipple><SoundOn/></Button>
+                            <Box className={classes.flexBox}>
+                                <Button className={classes.buttonStyle} onClick={() => this.handleDialogOpen(0)} disableRipple><CameraOn/></Button>
+                                <Button className={clsx(classes.buttonStyle, classes.buttonColor)} onClick={() => this.handleDialogOpen(1)} disableRipple><MikeOn/></Button>
+                                <Button className={classes.buttonStyle} onClick={() => this.handleDialogOpen(2)} disableRipple><SoundOn/></Button>
+                            </Box>
+                            <MobileSettingDialog
+                                dialogOpen={dialogOpen}
+                                handleDialogClose={this.handleDialogClose}
+                                settingValue={settingValue}
+                                camDevices={camDevices}
+                                micDevices={micDevices}
+                                selectedCamId={selectedCamId}
+                                selectedMicId={selectedMicId}
+                                completed={completed}
+                                camPreviewRef={this.camPreviewRef}
+                                handleTabChange={this.handleTabChange}
+                                handleChangeCamDevice={this.handleChangeCamDevice}
+                                handleChangeMicDevice={this.handleChangeMicDevice}
+                            />
                         </Box>
-                        <SettingDialog
-                            dialogOpen={dialogOpen}
-                            handleDialogClose={this.handleDialogClose}
-                            settingValue={settingValue}
-                            camDevices={camDevices}
-                            micDevices={micDevices}
-                            selectedCamId={selectedCamId}
-                            selectedMicId={selectedMicId}
-                            completed={completed}
-                            camPreviewRef={this.camPreviewRef}
-                            handleTabChange={this.handleTabChange}
-                            handleChangeCamDevice={this.handleChangeCamDevice}
-                            handleChangeMicDevice={this.handleChangeMicDevice}
-                        />
+                    </Box>
+                    <Box display='flex' alignItems='center'>
+                        <a href="mailto:cls@keris.or.kr" target="_blank" rel="noopener noreferrer" className={classes.footerText}>
+                            개선의견 접수
+                        </a>
+                        <a href="tel:1544-0079" className={classes.footerText}>
+                            서비스 문의 <strong>1544-0079</strong>
+                        </a>
                     </Box>
                 </Box>
+
             </div>
         );
     }
 }
 
-export default withStyles(style)(Standby);
+export default withStyles(style)(MobileStandby);

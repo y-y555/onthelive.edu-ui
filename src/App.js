@@ -2,6 +2,8 @@ import TopBar from "./standby/TopBar";
 import Standby from "./standby/Standby";
 import React from "react";
 import {getDeviceBrowserType} from "./common/lib/Common";
+import {Box} from "@material-ui/core";
+import MobileStandby from "./standby/mobile/MobileStandby";
 
 class App extends React.Component {
     constructor(props) {
@@ -34,13 +36,16 @@ class App extends React.Component {
         console.log("@@@@@@@@", window.innerWidth)
         return (
             <div className="App">
-                <TopBar/>
-                {this.state.isMobile ?
-                    <Standby/>
+                {this.state.isMobile &&  window.innerWidth < 801 ?
+                    <Box>
+                        <MobileStandby/>
+                    </Box>
                     :
-                    <Standby/>
+                    <Box>
+                        <TopBar/>
+                        <Standby/>
+                    </Box>
                 }
-
             </div>
         );
     }

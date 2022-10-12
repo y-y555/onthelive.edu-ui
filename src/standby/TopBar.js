@@ -14,13 +14,21 @@ const style = theme => ({
         '& *': {
             fontFamily: 'Noto Sans KR',
         },
+        '@media all and (max-width: 1200px)': {
+            padding: '15px 20px',
+        },
     },
     rootIn:{
-        width: 1140,
         margin:'0 auto',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        '@media all and (min-width: 800px)': {
+            maxWidth: 1140,
+        },
+        '@media all and (max-width: 1200px)': {
+            maxWidth: '100%',
+        },
     },
     flexBox:{
         display: 'flex',
